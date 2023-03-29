@@ -17,7 +17,18 @@ async function main() {
     UsingVRFv1Contract.address
   );
 
+  await sleep(30000);
+
+  await hre.run("verify:verify", {
+    address: UsingVRFv1Contract.address,
+    constructorArguments: [VRF_COORDINATOR_V1, LINK_TOKEN_GOERLI, KEY_HASH_V1, FEE],
+  });
 }
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 
 main()
   .then(() => process.exit(0))
