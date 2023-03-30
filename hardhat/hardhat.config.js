@@ -11,11 +11,34 @@ module.exports = {
     goerli: {
       url: QUICKNODE_HTTP_URL,
       accounts: [PRIVATE_KEY],
+      allowUnlimitedContractSize: true,
+      timeout: 100000000,
+
+
     },
+    hardhat: {
+      chainId: 1337,
+      forking: {
+        url: QUICKNODE_HTTP_URL,
+        enabled: true,
+        allowUnlimitedContractSize: true,
+        timeout: 100000000,
+
+      },
+    },
+    // goerli_fork: {
+    //   url: QUICKNODE_HTTP_URL,
+    //   allowUnlimitedContractSize: true,
+    //   timeout: 100000000,
+    // }
   },
   etherscan: {
     apiKey: {
       goerli: ETHERSCAN_KEY,
     }
   },
+  mocha: {
+    timeout: 100000000
+  },
+
 };

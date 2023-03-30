@@ -3,6 +3,7 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
+import "hardhat/console.sol";
 
 contract UsingVRFv1 is VRFConsumerBase, Ownable {
     // Variables obtained by the Chainlink oracle
@@ -31,6 +32,7 @@ contract UsingVRFv1 is VRFConsumerBase, Ownable {
         keyHash = vrfKeyHash;
         fee = vrfFee;
         gameStarted = false;
+        console.log("deployed with %d fee", fee);
     }
 
     // start game by setting appropriate variables
