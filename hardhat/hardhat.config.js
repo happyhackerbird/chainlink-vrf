@@ -11,6 +11,7 @@ module.exports = {
     goerli: {
       url: QUICKNODE_HTTP_URL,
       accounts: [PRIVATE_KEY],
+      timeout: 100000000,
     },
     hardhat: {
       chainId: 1337,
@@ -30,8 +31,8 @@ module.exports = {
       goerli: ETHERSCAN_KEY,
     }
   },
-  // mocha: {
-  //   timeout: 100000000
-  // },
+  mocha: {
+    timeout: 100000000
+  },
 
 };
