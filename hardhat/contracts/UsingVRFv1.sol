@@ -20,7 +20,8 @@ contract UsingVRFv1 is VRFConsumerBase, Ownable {
 
     event GameStarted(uint256 gameId, uint8 maxPlayers, uint256 entryFee);
     event PlayerJoined(uint256 gameId, address player);
-    event GameEnded(uint256 gameId, address winner, bytes32 requestId);
+    event RequestSubmitted(uint256 gameId, uint256 request);
+    event GameEnded(uint256 gameId, address winner, uint256 request);
 
     //constructor needs to initiate the values for keyHash and fee of the VRFConsumerBase
     constructor(
@@ -38,7 +39,6 @@ contract UsingVRFv1 is VRFConsumerBase, Ownable {
     // start game by setting appropriate variables
     function startGame(uint8 _maxPlayers, uint256 _entryFee) public onlyOwner {
         require(!gameStarted, "Already a game running");
-        delete players;
         gameStarted = true;
         entryFee = _entryFee;
         maxPlayers = _maxPlayers;
@@ -54,13 +54,13 @@ contract UsingVRFv1 is VRFConsumerBase, Ownable {
         players.push(msg.sender);
         emit PlayerJoined(gameId, msg.sender);
 
-        // if there are enough players, end the game & select a winner
+        // if there are enough players, end the game
         if (players.length == maxPlayers) {
-            endGameAndGetWinner();
+            getRandomWinner();
         }
     }
 
-    function endGameAndGetWinner() private returns (bytes32 requestId) {
+    function getRandomWinner() private returns (bytes32 requestId) {
         // VRFConsumerBase holds an internal inteface to LINK token
         // check if our contract has enough link to pay for the request
         require(
@@ -69,7 +69,9 @@ contract UsingVRFv1 is VRFConsumerBase, Ownable {
         );
         // function in VRFConsumerBase to request randomness
         // VRFConsumerBase internally calls VRFCoordinator to get randomness from oracle
-        return requestRandomness(keyHash, fee);
+        requestId = requestRandomness(keyHash, fee);
+        uint256 request = uint256(requestId);
+        emit RequestSubmitted(gameId, request);
     }
 
     // this function is called by the VRFCoordinator when it's received & validated the randomness from the oracle
@@ -83,8 +85,11 @@ contract UsingVRFv1 is VRFConsumerBase, Ownable {
         address winner = players[winnerIndex];
         (bool sent, ) = winner.call{value: address(this).balance}("");
         require(sent, "Failed to send Ether");
-        gameStarted = false;
-
-        emit GameEnded(gameId, winner, requestId);
+        delete players;
+        emit GameEnded(gameId, winner, uint256(requestId));
     }
+
+    receive() external payable {}
+
+    fallback() external payable {}
 }

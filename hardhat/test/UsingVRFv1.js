@@ -23,7 +23,6 @@ describe("TestVRFv1", function () {
             FEE
         );
 
-
         describe("StartGame", function () {
             it("should start the game", async function () {
                 await expect(contract.startGame(3, gameFee)).to.emit(contract, "GameStarted").withArgs(1, 3, gameFee);
@@ -59,20 +58,19 @@ describe("TestVRFv1", function () {
                 });
                 describe("DetermineWinner", function () {
                     let receipt;
-                    it("should end the game when last player joins", async function () {
-                        const last_join = await contract.joinGame({ value: gameFee }); // this will throw an error
-                        // cannot estimate gas; transaction may fail or may require manual gas limit 
-                        // from a call trying to revert
-                        // solution: put gasLimit: 3e7 or allowUnlimitedContractSize: true in config
-                        receipt = await last_join.wait();
+                    it("should end the game and submit a randomness request", async function () {
+                        const tx = await contract.joinGame({ value: gameFee });
+                        await expect(tx).to.emit(contract, "RequestSubmitted");
+                        receipt = await tx.wait();
+                        console.log(receipt.events?.filter((x) => { return x.event == "RequestSubmitted" }));
                     });
-                    it("emit a GameEnded event that declares a winning address", async function () {
-                        for (const event of receipt.events) {
-                            console.log(`Event ${event.event} with args ${event.args}`);
-                        }
-                        // let winner_address = 
-                        console.log(receipt.events?.filter((x) => { return x.event == "GameEnded" }));
-                        // console.log("winner is", winner_address);
+                    it("no new players should be allowed to join", async function () {
+                        await expect(contract.connect(addr1).joinGame({ value: gameFee })).to.be.revertedWith("Game is full");
+                    });
+                    it("should get a random winner", async function () {
+
+                    });
+                    it("callback from oracle should emit a GameEnded event that declares a winning address", async function () {
                     });
                     // it("should transfer funds to winner", async function () {
                     // });
