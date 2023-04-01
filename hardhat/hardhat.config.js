@@ -3,6 +3,9 @@ require("dotenv").config({ path: ".env" });
 
 const QUICKNODE_HTTP_URL = process.env.QUICKNODE_HTTP_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
+// const PRIVATE_KEY1 = process.env.PRIVATE_KEY1;
+// const PRIVATE_KEY2 = process.env.PRIVATE_KEY2;
+
 const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY
 
 module.exports = {
