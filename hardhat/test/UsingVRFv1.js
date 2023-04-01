@@ -72,7 +72,7 @@ describe("TestVRFv1", function () {
                             linkToken,
                             sender,
                             -FEE
-                        );
+                        ); // changeTokenBalance gives some error 
                         const contractLinkBalance = await linkToken.balanceOf(receiver);
                         console.log(`Balance of contract: ${ethers.utils.formatUnits(contractLinkBalance, "ether")}`);
                     });
@@ -83,22 +83,33 @@ describe("TestVRFv1", function () {
                         const tx = await contract.joinGame({ value: gameFee });
                         await expect(tx).to.emit(contract, "RequestSubmitted");
                         receipt = await tx.wait();
-                        console.log(receipt.events.find((x) => { return x.event == "RequestSubmitted" }));
-                    });
-                    it("callback from oracle should emit a GameEnded event that declares a winning address", async function () {
-                        // create a listener for the GameEnded event
-                        contract.on("GameEnded", (gameId, winner, request) => {
-                            console.log("Winner with request is:");
-                            console.log(winner, request);
-                        });
+                        // console.log(receipt.events.find((x) => { return x.event == "RequestSubmitted" }));
                     });
                     // in between the oracle callback and submitting the request to it, it should not be possible to join the game
                     it("test error: no new players should be allowed to join after oracle request", async function () {
                         await expect(contract.connect(addr1).joinGame({ value: gameFee })).to.be.revertedWith("Game is full");
-                        await sleep(120000); // wait for 2 minutes for the callback from the oracle to be received
+                    });
+                    it("callback from oracle should emit a GameEnded event that declares a winning address", async function () {
+                        // // create a filter for the GameEnded event
+                        // filter = {
+                        //     address: contract.address,
+                        //     topics: [
+                        //         ethers.utils.id("GameEnded(uint256,address,uint256)")]
+                        // };
+                        // // add a listener that will print out the winner  
+                        // provider.on(filter, (log, event) => {
+                        //     console.log("Winner with request is:");
+                        //     console.log(event.winner, event.request);
+                        // });
+
+                        // add a listener for game ended event
+                        contract.on("GameEnded", (gameId, winner, request) => {
+                            console.log("Winner with request is:");
+                            console.log(winner, request);
+                        });
+                        await sleep(120000); // wait 2 minutes for the oracle to callback and trigger the listener
                         // then it should print out the winner
                         // will only succeed on real testnet (not local hardhat fork)
-
                     });
                     // it("should transfer funds to winner", async function () {
                     // });
