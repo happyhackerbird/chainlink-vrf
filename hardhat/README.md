@@ -37,9 +37,9 @@ npx hardhat run scripts/deploy.js --network goerli
 Will deploy to goerli and verify the contract on etherscan.
 
 ### Todo
-- [] Use VRF V2
-- [] Test by implementing MockVRFCoordinator.sol
-- [] Write the scaffold eth challenge tutorial for V2
+- [ ] Use VRF V2
+- [ ] Test by implementing MockVRFCoordinator.sol
+- [ ] Write the scaffold eth challenge tutorial for V2
 
 ### Writeup for scaffold eth challenge tutorial: 
 
